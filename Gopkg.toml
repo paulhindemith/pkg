@@ -4,6 +4,11 @@ required = [
 "knative.dev/test-infra/scripts",
 ]
 
+[[constraint]]
+  name = "github.com/labstack/echo"
+  branch = "master"
+  source = "https://github.com/labstack/echo.git"
+
 [prune]
   go-tests = true
   unused-packages = true

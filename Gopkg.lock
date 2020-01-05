@@ -232,6 +232,42 @@
   version = "v1.1.9"
 
 [[projects]]
+  branch = "master"
+  digest = "1:3f8af2fa039303b8afabe9744438687e49af92616e0c892a39ef2eb13de5105a"
+  name = "github.com/labstack/echo"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "5793765eedc2207d2a777ae23be11b2f3ba862f2"
+  source = "https://github.com/labstack/echo.git"
+
+[[projects]]
+  digest = "1:e9cb57fc3c5d6c53e190eee739dbe0c778e27be9039d0b60d9c9bf6993e8b8b6"
+  name = "github.com/labstack/gommon"
+  packages = [
+    "color",
+    "log",
+  ]
+  pruneopts = "NUT"
+  revision = "4919956f6fb227b548f004da27c7c6b20fba499f"
+  version = "v0.3.0"
+
+[[projects]]
+  digest = "1:bced2617aac935b7931d43bdd5fd5ef3eacbb52291c61e423afe8037f6dd95f9"
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "98ec13f34aabf44cc914c65a1cfb7b9bc815aef1"
+  version = "v0.1.4"
+
+[[projects]]
+  digest = "1:046ef248b5b3f2a9f547e93a9d18d319b2a906b92720a037452a888d48818e2d"
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "31745d66dd679ac0ac4f8d3ecff168fce6170c6a"
+  version = "v0.0.11"
+
+[[projects]]
   digest = "1:5985ef4caf91ece5d54817c11ea25f182697534f8ae6521eadcd628c142ac4b6"
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
@@ -327,6 +363,22 @@
   version = "v1.5.1"
 
 [[projects]]
+  digest = "1:af354641f23332b1a8d5d361d11b5a9171589e412a67d499633706c611acc064"
+  name = "github.com/valyala/bytebufferpool"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:f17377eef01c91aee2d0f93095d672bd27697c62e5546bde97f9c8412c141356"
+  name = "github.com/valyala/fasttemplate"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "8fcc7a99b5795b7c3e95172237cf93282fc339a9"
+  version = "v1.1.0"
+
+[[projects]]
   digest = "1:b3125df339c80dd88259bd401103be60df5f5181335e8e717ec8d3edbd50e90e"
   name = "go.opencensus.io"
   packages = [
@@ -395,9 +447,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:bbe51412d9915d64ffaa96b51d409e070665efc5194fcf145c4a27d4133107a4"
+  digest = "1:c7aa9bb2473a4b13633ca39df90273b776246c27ace7c1af75adc98811a82775"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "acme",
+    "acme/autocert",
+    "ssh/terminal",
+  ]
   pruneopts = "NUT"
   revision = "53104e6ec876ad4e22ad27cce588b01392043c1b"
 
@@ -414,13 +470,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4cd121a36427d4fd2d8d119cb9108e56a74e6dd8a6f789408f90f92f1f2e7798"
+  digest = "1:cc46625cd452ce7042f9c6be6e53aac7b07b692eb8809f9c920a3f5222820882"
   name = "golang.org/x/net"
   packages = [
     "context",
     "context/ctxhttp",
     "http/httpguts",
     "http2",
+    "http2/h2c",
     "http2/hpack",
     "idna",
     "internal/timeseries",
@@ -1027,6 +1084,14 @@
   revision = "169ef0797c1f7e548574e6aee289002c0f22dc0a"
 
 [[projects]]
+  digest = "1:20dbbc6c7ba032696bae6527a6b9731244b4e18ad0b415f4743d08d43201e5cb"
+  name = "knative.dev/serving"
+  packages = ["pkg/network"]
+  pruneopts = "NUT"
+  revision = "6b0e5c628deb43d56f9b0c5237e97562b6ca587f"
+  version = "v0.11.1"
+
+[[projects]]
   branch = "master"
   digest = "1:c41ef8736a012d015872fee1162c014992cfc9c744d87a7c74fd4a2e9e7c6a5b"
   name = "knative.dev/test-infra"
@@ -1046,6 +1111,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/labstack/echo",
     "github.com/paulhindemith/dev-infra/hack",
     "github.com/paulhindemith/dev-infra/hack/boilerplate",
     "go.uber.org/zap",
@@ -1066,6 +1132,7 @@
     "knative.dev/pkg/signals",
     "knative.dev/pkg/system",
     "knative.dev/pkg/version",
+    "knative.dev/serving/pkg/network",
     "knative.dev/test-infra/scripts",
   ]
   solver-name = "gps-cdcl"
