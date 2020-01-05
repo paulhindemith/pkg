@@ -1,218 +1,128 @@
 /*
-Copyright 2019 The Knative Authors
+Copyright 2018 The Knative Authors
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
+    https://www.apache.org/licenses/LICENSE-2.0
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+Modifications Copyright 2020 Paulhindemith
+
+The original source code can be referenced from the link below.
+https://github.com/knative/pkg/blob/80da64a31cc4cec93ce633f0634387fcffadddda/injection/sharedmain/main.go
+The change history can be obtained by looking at the differences from the
+following commit that added as the original source code.
+1df0da6786f61de259f1e78ab475d84132ca350e
 */
 
-package sharedmain
+package adapter
 
 import (
-	"context"
-	"flag"
-	"fmt"
+  "context"
 	"log"
+  "time"
+  "os"
 	"net/http"
-	"os"
-	"os/user"
-	"path/filepath"
-	"time"
 
-	"go.opencensus.io/stats/view"
-	"golang.org/x/sync/errgroup"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
+  "go.uber.org/zap"
+  "golang.org/x/sync/errgroup"
 
-	"go.uber.org/zap"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	kubeclient "knative.dev/pkg/client/injection/kube/client"
-	"knative.dev/pkg/configmap"
-	"knative.dev/pkg/controller"
-	"knative.dev/pkg/injection"
-	"knative.dev/pkg/logging"
-	"knative.dev/pkg/metrics"
-	"knative.dev/pkg/profiling"
-	"knative.dev/pkg/signals"
-	"knative.dev/pkg/system"
-	"knative.dev/pkg/version"
-	"knative.dev/pkg/webhook"
+  "knative.dev/pkg/profiling"
+  "knative.dev/pkg/metrics"
+  "knative.dev/pkg/signals"
+  "knative.dev/pkg/configmap"
+  "knative.dev/pkg/system"
+  "knative.dev/pkg/injection"
+  pkglogging "knative.dev/pkg/logging"
+  "knative.dev/pkg/version"
+  kubeclient "knative.dev/pkg/client/injection/kube/client"
+
+  "k8s.io/apimachinery/pkg/util/wait"
+  metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+  kubernetes "k8s.io/client-go/kubernetes"
+
+  "github.com/paulhindemith/pkg/logkey"
 )
 
-// GetConfig returns a rest.Config to be used for kubernetes client creation.
-// It does so in the following order:
-//   1. Use the passed kubeconfig/masterURL.
-//   2. Fallback to the KUBECONFIG environment variable.
-//   3. Fallback to in-cluster config.
-//   4. Fallback to the ~/.kube/config.
-func GetConfig(masterURL, kubeconfig string) (*rest.Config, error) {
-	if kubeconfig == "" {
-		kubeconfig = os.Getenv("KUBECONFIG")
-	}
-	// If we have an explicit indication of where the kubernetes config lives, read that.
-	if kubeconfig != "" {
-		return clientcmd.BuildConfigFromFlags(masterURL, kubeconfig)
-	}
-	// If not, try the in-cluster config.
-	if c, err := rest.InClusterConfig(); err == nil {
-		return c, nil
-	}
-	// If no in-cluster config, try the default location in the user's home directory.
-	if usr, err := user.Current(); err == nil {
-		if c, err := clientcmd.BuildConfigFromFlags("", filepath.Join(usr.HomeDir, ".kube", "config")); err == nil {
-			return c, nil
-		}
-	}
+const (
+  PodNameEnvKey = "SYSTEM_POD_NAME"
+)
 
-	return nil, fmt.Errorf("could not create a valid kubeconfig")
+type Adapter interface {
+	Start(stopCh <-chan struct{}) error
 }
 
-// GetLoggingConfig gets the logging config from either the file system if present
-// or via reading a configMap from the API.
-// The context is expected to be initialized with injection.
-func GetLoggingConfig(ctx context.Context) (*logging.Config, error) {
-	loggingConfigMap, err := kubeclient.Get(ctx).CoreV1().ConfigMaps(system.Namespace()).Get(logging.ConfigMapName(), metav1.GetOptions{})
-	if err != nil {
-		if apierrors.IsNotFound(err) {
-			return logging.NewConfigFromMap(nil)
-		} else {
-			return nil, err
-		}
-	}
+type AdapterConstructor func(ctx context.Context) Adapter
 
-	return logging.NewConfigFromConfigMap(loggingConfigMap)
+func GetLoggingConfig(kc kubernetes.Interface) (*pkglogging.Config, error) {
+  loggingConfigMap, err := kc.CoreV1().ConfigMaps(system.Namespace()).Get(pkglogging.ConfigMapName(), metav1.GetOptions{})
+  if err != nil {
+    return nil, err
+  }
+  return pkglogging.NewConfigFromConfigMap(loggingConfigMap)
 }
 
-func Main(component string, ctors ...injection.ControllerConstructor) {
-	// Set up signals so we handle the first shutdown signal gracefully.
-	MainWithContext(signals.NewContext(), component, ctors...)
+func Main(component string, ctor AdapterConstructor) {
+  // Set up signals so we handle the first shutdown signal gracefully.
+	ctx := signals.NewContext()
+  kc := kubeclient.Get(ctx)
+	MainWithClient(component, ctor, ctx, kc)
 }
 
-func MainWithContext(ctx context.Context, component string, ctors ...injection.ControllerConstructor) {
-	var (
-		masterURL  = flag.String("master", "", "The address of the Kubernetes API server. Overrides any value in kubeconfig. Only required if out-of-cluster.")
-		kubeconfig = flag.String("kubeconfig", "", "Path to a kubeconfig. Only required if out-of-cluster.")
-	)
-	flag.Parse()
-
-	cfg, err := GetConfig(*masterURL, *kubeconfig)
-	if err != nil {
-		log.Fatal("Error building kubeconfig", err)
-	}
-	MainWithConfig(ctx, component, cfg, ctors...)
-}
-
-func MainWithConfig(ctx context.Context, component string, cfg *rest.Config, ctors ...injection.ControllerConstructor) {
-	log.Printf("Registering %d clients", len(injection.Default.GetClients()))
+func MainWithClient(component string, ctor AdapterConstructor, ctx context.Context, kc kubernetes.Interface) {
+  log.Printf("Registering %d clients", len(injection.Default.GetClients()))
 	log.Printf("Registering %d informer factories", len(injection.Default.GetInformerFactories()))
 	log.Printf("Registering %d informers", len(injection.Default.GetInformers()))
-	log.Printf("Registering %d controllers", len(ctors))
 
-	// Report stats on Go memory usage every 30 seconds.
-	msp := metrics.NewMemStatsAll()
-	msp.Start(ctx, 30*time.Second)
+  var err error
 
-	if err := view.Register(msp.DefaultViews()...); err != nil {
-		log.Fatalf("Error exporting go memstats view: %v", err)
+  // We sometimes startup faster than we can reach kube-api. Poll on failure to prevent us terminating
+	if perr := wait.PollImmediate(time.Second, 60*time.Second, func() (bool, error) {
+    err := version.CheckMinimumVersion(kc.Discovery())
+		if err != nil {
+			log.Printf("Failed to get k8s version %v", err)
+		}
+		return err == nil, nil
+	}); perr != nil {
+		log.Fatal("Timed out attempting to get k8s version: ", err)
 	}
-
-	// Adjust our client's rate limits based on the number of controller's we are running.
-	cfg.QPS = float32(len(ctors)) * rest.DefaultQPS
-	cfg.Burst = len(ctors) * rest.DefaultBurst
-
-	ctx, informers := injection.Default.SetupInformers(ctx, cfg)
 
 	// Set up our logger.
-	loggingConfig, err := GetLoggingConfig(ctx)
+  loggingConfig, err := GetLoggingConfig(kc)
 	if err != nil {
-		log.Fatal("Error reading/parsing logging configuration:", err)
+		log.Fatal("Error loading/parsing logging configuration: ", err)
 	}
-	logger, atomicLevel := logging.NewLoggerFromConfig(loggingConfig, component)
+  logger, atomicLevel := pkglogging.NewLoggerFromConfig(loggingConfig, component)
+
+	logger = logger.With(zap.String(logkey.Name, component),
+		zap.String(logkey.Pod, os.Getenv(PodNameEnvKey)))
+	ctx = pkglogging.WithLogger(ctx, logger)
 	defer flush(logger)
-	ctx = logging.WithLogger(ctx, logger)
 
-	kc := kubeclient.Get(ctx)
-	if err := version.CheckMinimumVersion(kc.Discovery()); err != nil {
-		logger.Fatalw("Version check failed", zap.Error(err))
-	}
+  profilingHandler := profiling.NewHandler(logger, false)
 
-	// TODO(mattmoor): This should itself take a context and be injection-based.
-	cmw := configmap.NewInformedWatcher(kc, system.Namespace())
+  configMapWatcher := configmap.NewInformedWatcher(kc, system.Namespace())
+  configMapWatcher.Watch(pkglogging.ConfigMapName(), pkglogging.UpdateLevelFromConfigMap(logger, atomicLevel, component))
+  configMapWatcher.Watch(metrics.ConfigMapName(),profilingHandler.UpdateFromConfigMap)
 
-	// Based on the reconcilers we have linked, build up the set of controllers to run.
-	controllers := make([]*controller.Impl, 0, len(ctors))
-	webhooks := make([]webhook.AdmissionController, 0)
-	for _, cf := range ctors {
-		ctrl := cf(ctx, cmw)
-		controllers = append(controllers, ctrl)
+  if err = configMapWatcher.Start(ctx.Done()); err != nil {
+  	logger.Fatalw("Failed to start configuration manager", zap.Error(err))
+  }
 
-		// Build a list of any reconcilers that implement webhook.AdmissionController
-		if ac, ok := ctrl.Reconciler.(webhook.AdmissionController); ok {
-			webhooks = append(webhooks, ac)
-		}
-	}
+  adapter := ctor(ctx)
 
-	profilingHandler := profiling.NewHandler(logger, false)
+  logger.Info("Starting Receive Adapter")
+  go adapter.Start(ctx.Done())
 
-	// Watch the logging config map and dynamically update logging levels.
-	if _, err := kubeclient.Get(ctx).CoreV1().ConfigMaps(system.Namespace()).Get(logging.ConfigMapName(),
-		metav1.GetOptions{}); err == nil {
-		cmw.Watch(logging.ConfigMapName(), logging.UpdateLevelFromConfigMap(logger, atomicLevel, component))
-	} else if !apierrors.IsNotFound(err) {
-		logger.Fatalw("Error reading ConfigMap: "+logging.ConfigMapName(), zap.Error(err))
-	}
+  eg, egCtx := errgroup.WithContext(ctx)
+  profilingServer := profiling.NewServer(profilingHandler)
+  eg.Go(profilingServer.ListenAndServe)
 
-	// Watch the observability config map
-	if _, err := kubeclient.Get(ctx).CoreV1().ConfigMaps(system.Namespace()).Get(metrics.ConfigMapName(),
-		metav1.GetOptions{}); err == nil {
-		cmw.Watch(metrics.ConfigMapName(),
-			metrics.UpdateExporterFromConfigMap(component, logger),
-			profilingHandler.UpdateFromConfigMap)
-	} else if !apierrors.IsNotFound(err) {
-		logger.Fatalw("Error reading ConfigMap: "+metrics.ConfigMapName(), zap.Error(err))
-	}
-
-	if err := cmw.Start(ctx.Done()); err != nil {
-		logger.Fatalw("failed to start configuration manager", zap.Error(err))
-	}
-
-	// Start all of the informers and wait for them to sync.
-	logger.Info("Starting informers.")
-	if err := controller.StartInformers(ctx.Done(), informers...); err != nil {
-		logger.Fatalw("Failed to start informers", err)
-	}
-
-	// Start all of the controllers.
-	logger.Info("Starting controllers...")
-	go controller.StartAll(ctx.Done(), controllers...)
-
-	profilingServer := profiling.NewServer(profilingHandler)
-
-	eg, egCtx := errgroup.WithContext(ctx)
-	eg.Go(profilingServer.ListenAndServe)
-
-	// If we have one or more admission controllers, then start the webhook
-	// and pass them in.
-	if len(webhooks) > 0 {
-		// Register webhook metrics
-		webhook.RegisterMetrics()
-
-		wh, err := webhook.New(ctx, webhooks)
-		if err != nil {
-			logger.Fatalw("Failed to create admission controller", zap.Error(err))
-		}
-		eg.Go(func() error {
-			return wh.Run(ctx.Done())
-		})
-	}
-
-	// This will block until either a signal arrives or one of the grouped functions
+  // This will block until either a signal arrives or one of the grouped functions
 	// returns an error.
 	<-egCtx.Done()
 
@@ -220,10 +130,13 @@ func MainWithConfig(ctx context.Context, component string, cfg *rest.Config, cto
 	// Don't forward ErrServerClosed as that indicates we're already shutting down.
 	if err := eg.Wait(); err != nil && err != http.ErrServerClosed {
 		logger.Errorw("Error while running server", zap.Error(err))
-	}
+	} else {
+    logger.Info("Shutdowned Profiling Server")
+  }
 }
 
 func flush(logger *zap.SugaredLogger) {
 	logger.Sync()
-	metrics.FlushExporter()
+  os.Stdout.Sync()
+	os.Stderr.Sync()
 }

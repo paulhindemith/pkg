@@ -1,0 +1,18 @@
+required = [
+"github.com/paulhindemith/dev-infra/hack",
+"github.com/paulhindemith/dev-infra/hack/boilerplate",
+"knative.dev/test-infra/scripts",
+]
+
+[prune]
+  go-tests = true
+  unused-packages = true
+  non-go = true
+
+[[prune.project]]
+  name = "github.com/paulhindemith/dev-infra"
+  non-go = false
+
+[[prune.project]]
+  name = "knative.dev/test-infra"
+  non-go = false
