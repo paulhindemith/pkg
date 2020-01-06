@@ -175,7 +175,7 @@ func TestMainWithClient(t *testing.T) {
 	}
 }
 
-func (m *testAdapter) Start(stopCh <-chan struct{}) error {
+func (m *testAdapter) Start(stopCh <-chan struct{}) {
 	m.mutex.Lock()
 	startAdapter = true
 	m.mutex.Unlock()
@@ -184,5 +184,4 @@ func (m *testAdapter) Start(stopCh <-chan struct{}) error {
 	m.mutex.Lock()
 	receivedSignal = true
 	m.mutex.Unlock()
-	return nil
 }

@@ -52,12 +52,15 @@ const (
   PodNameEnvKey = "SYSTEM_POD_NAME"
 )
 
+// Adapter must have Start method.
 type Adapter interface {
-	Start(stopCh <-chan struct{}) error
+	Start(stopCh <-chan struct{})
 }
 
+// AdapterConstructor returns Adapter.
 type AdapterConstructor func(ctx context.Context) Adapter
 
+// GetLoggingConfig returns configmap typed pkglogging.Config from ApiServer.
 func GetLoggingConfig(kc kubernetes.Interface) (*pkglogging.Config, error) {
   loggingConfigMap, err := kc.CoreV1().ConfigMaps(system.Namespace()).Get(pkglogging.ConfigMapName(), metav1.GetOptions{})
   if err != nil {
@@ -73,6 +76,12 @@ func Main(component string, ctor AdapterConstructor) {
 	MainWithClient(component, ctor, ctx, kc)
 }
 
+// MainWithClient
+// - watches profiling and logging configmap
+// - defines zap logger
+// - runs injected AdapterConstructor which is called Receive Server
+// - runs Profiling Server
+// - Sends Signal to injected AdapterConstructor and shutdown Profiling Server when received
 func MainWithClient(component string, ctor AdapterConstructor, ctx context.Context, kc kubernetes.Interface) {
   log.Printf("Registering %d clients", len(injection.Default.GetClients()))
 	log.Printf("Registering %d informer factories", len(injection.Default.GetInformerFactories()))
