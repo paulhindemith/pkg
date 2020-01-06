@@ -42,7 +42,7 @@ var (
 	}
 )
 
-// K8sHealthz returns a X-Request-ID middleware.
+// K8sHealthz returns MiddlewareFunc.
 func K8sHealthz() echo.MiddlewareFunc {
 	return K8sHealthzWithConfig(DefaultK8sHealthzConfig)
 }
