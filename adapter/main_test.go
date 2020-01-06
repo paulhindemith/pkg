@@ -17,29 +17,29 @@ limitations under the License.
 package adapter
 
 import (
-	"log"
-	"time"
 	"context"
-	"os"
-	"syscall"
-	"testing"
+	"golang.org/x/sync/errgroup"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
-	"golang.org/x/sync/errgroup"
+	"syscall"
+	"testing"
+	"time"
 
-	"knative.dev/pkg/signals"
-	fakeclientset "k8s.io/client-go/kubernetes/fake"
-	fakediscovery "k8s.io/client-go/discovery/fake"
-	"k8s.io/apimachinery/pkg/version"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apimachinery/pkg/version"
+	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/kubernetes"
+	fakeclientset "k8s.io/client-go/kubernetes/fake"
+	"knative.dev/pkg/signals"
 )
 
 var (
-	startAdapter = false
+	startAdapter   = false
 	receivedSignal = false
 )
 
@@ -50,9 +50,9 @@ type testAdapter struct {
 func createConfigmap(name string, data map[string]string, kc kubernetes.Interface) error {
 	_, err := kc.CoreV1().ConfigMaps("ns").Create(&corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-        Name:      name,
-        Namespace: "ns",
-    },
+			Name:      name,
+			Namespace: "ns",
+		},
 		Data: data,
 	})
 	return err
@@ -61,9 +61,9 @@ func createConfigmap(name string, data map[string]string, kc kubernetes.Interfac
 func updateConfigmap(name string, data map[string]string, kc kubernetes.Interface) error {
 	_, err := kc.CoreV1().ConfigMaps("ns").Update(&corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-        Name:      name,
-        Namespace: "ns",
-    },
+			Name:      name,
+			Namespace: "ns",
+		},
 		Data: data,
 	})
 	return err
@@ -124,7 +124,7 @@ func TestMainWithClient(t *testing.T) {
 	})
 
 	if err := eg.Wait(); err != nil {
-	    t.Fatal(err)
+		t.Fatal(err)
 	}
 	// ----------------------------------------------------------------------------
 	// Profiling Server should have not been running.
@@ -132,7 +132,7 @@ func TestMainWithClient(t *testing.T) {
 	updateConfigmap("config-observability", map[string]string{"profiling.enable": "false"}, kubeClient)
 	// then
 	wait.PollImmediate(10*time.Millisecond, 5*time.Second, func() (bool, error) {
-    resp, _ := httpClient.Do(req)
+		resp, _ := httpClient.Do(req)
 		if resp != nil {
 			return http.StatusNotFound == resp.StatusCode, nil
 		}
@@ -144,7 +144,7 @@ func TestMainWithClient(t *testing.T) {
 	updateConfigmap("config-observability", map[string]string{"profiling.enable": "true"}, kubeClient)
 	// then
 	wait.PollImmediate(10*time.Millisecond, 5*time.Second, func() (bool, error) {
-    resp, _ := httpClient.Do(req)
+		resp, _ := httpClient.Do(req)
 		if resp != nil {
 			return http.StatusOK == resp.StatusCode, nil
 		}
@@ -171,7 +171,7 @@ func TestMainWithClient(t *testing.T) {
 	})
 
 	if err := eg.Wait(); err != nil {
-			t.Fatal(err)
+		t.Fatal(err)
 	}
 }
 

@@ -21,27 +21,27 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"knative.dev/serving/pkg/network"
 	"github.com/labstack/echo"
+	"knative.dev/serving/pkg/network"
 )
 
 func TestProbeMiddleware(t *testing.T) {
 	// Setup
-  probeHeaderValue := "test"
+	probeHeaderValue := "test"
 	e := echo.New()
-  e.Use(K8sProbe(probeHeaderValue))
-  req := httptest.NewRequest("GET", "/healthz", nil)
-  req.Header.Set(network.ProbeHeaderName, probeHeaderValue)
-  rec := httptest.NewRecorder()
+	e.Use(K8sProbe(probeHeaderValue))
+	req := httptest.NewRequest("GET", "/healthz", nil)
+	req.Header.Set(network.ProbeHeaderName, probeHeaderValue)
+	rec := httptest.NewRecorder()
 
-  e.ServeHTTP(rec, req)
+	e.ServeHTTP(rec, req)
 
-  if http.StatusOK != rec.Code {
-    t.Errorf("Unexpected http status code. Expect: %v, but got: %v",
-      http.StatusOK, rec.Code)
-  }
-  if probeHeaderValue != rec.Body.String() {
-    t.Errorf("Unexpected http response body. Expect: %v, but got: %v",
-      probeHeaderValue, rec.Body.String())
-  }
+	if http.StatusOK != rec.Code {
+		t.Errorf("Unexpected http status code. Expect: %v, but got: %v",
+			http.StatusOK, rec.Code)
+	}
+	if probeHeaderValue != rec.Body.String() {
+		t.Errorf("Unexpected http response body. Expect: %v, but got: %v",
+			probeHeaderValue, rec.Body.String())
+	}
 }

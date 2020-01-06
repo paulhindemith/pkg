@@ -27,15 +27,15 @@ import (
 func TestHealthzMiddleware(t *testing.T) {
 	// Setup
 	e := echo.New()
-  e.Use(K8sHealthzWithConfig(DefaultK8sHealthzConfig))
-  req := httptest.NewRequest("GET", "/healthz", nil)
-  req.Header.Set("User-Agent", "kube-probe/1.15")
-  rec := httptest.NewRecorder()
+	e.Use(K8sHealthzWithConfig(DefaultK8sHealthzConfig))
+	req := httptest.NewRequest("GET", "/healthz", nil)
+	req.Header.Set("User-Agent", "kube-probe/1.15")
+	rec := httptest.NewRecorder()
 
-  e.ServeHTTP(rec, req)
+	e.ServeHTTP(rec, req)
 
-  if http.StatusOK != rec.Code {
-    t.Errorf("Unexpected http status code. Expect: %v, but got: %v",
-      http.StatusOK, rec.Code)
-  }
+	if http.StatusOK != rec.Code {
+		t.Errorf("Unexpected http status code. Expect: %v, but got: %v",
+			http.StatusOK, rec.Code)
+	}
 }

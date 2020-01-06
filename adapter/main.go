@@ -22,34 +22,34 @@ following commit that added as the original source code.
 package adapter
 
 import (
-  "context"
+	"context"
 	"log"
-  "time"
-  "os"
 	"net/http"
+	"os"
+	"time"
 
-  "go.uber.org/zap"
-  "golang.org/x/sync/errgroup"
+	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 
-  "knative.dev/pkg/profiling"
-  "knative.dev/pkg/metrics"
-  "knative.dev/pkg/signals"
-  "knative.dev/pkg/configmap"
-  "knative.dev/pkg/system"
-  "knative.dev/pkg/injection"
-  pkglogging "knative.dev/pkg/logging"
-  "knative.dev/pkg/version"
-  kubeclient "knative.dev/pkg/client/injection/kube/client"
+	kubeclient "knative.dev/pkg/client/injection/kube/client"
+	"knative.dev/pkg/configmap"
+	"knative.dev/pkg/injection"
+	pkglogging "knative.dev/pkg/logging"
+	"knative.dev/pkg/metrics"
+	"knative.dev/pkg/profiling"
+	"knative.dev/pkg/signals"
+	"knative.dev/pkg/system"
+	"knative.dev/pkg/version"
 
-  "k8s.io/apimachinery/pkg/util/wait"
-  metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-  kubernetes "k8s.io/client-go/kubernetes"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
+	kubernetes "k8s.io/client-go/kubernetes"
 
-  "github.com/paulhindemith/pkg/logkey"
+	"github.com/paulhindemith/pkg/logkey"
 )
 
 const (
-  PodNameEnvKey = "SYSTEM_POD_NAME"
+	PodNameEnvKey = "SYSTEM_POD_NAME"
 )
 
 // Adapter must have Start method.
@@ -62,17 +62,17 @@ type AdapterConstructor func(ctx context.Context) Adapter
 
 // GetLoggingConfig returns configmap typed pkglogging.Config from ApiServer.
 func GetLoggingConfig(kc kubernetes.Interface) (*pkglogging.Config, error) {
-  loggingConfigMap, err := kc.CoreV1().ConfigMaps(system.Namespace()).Get(pkglogging.ConfigMapName(), metav1.GetOptions{})
-  if err != nil {
-    return nil, err
-  }
-  return pkglogging.NewConfigFromConfigMap(loggingConfigMap)
+	loggingConfigMap, err := kc.CoreV1().ConfigMaps(system.Namespace()).Get(pkglogging.ConfigMapName(), metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return pkglogging.NewConfigFromConfigMap(loggingConfigMap)
 }
 
 func Main(component string, ctor AdapterConstructor) {
-  // Set up signals so we handle the first shutdown signal gracefully.
+	// Set up signals so we handle the first shutdown signal gracefully.
 	ctx := signals.NewContext()
-  kc := kubeclient.Get(ctx)
+	kc := kubeclient.Get(ctx)
 	MainWithClient(component, ctor, ctx, kc)
 }
 
@@ -83,15 +83,15 @@ func Main(component string, ctor AdapterConstructor) {
 // - runs Profiling Server
 // - Sends Signal to injected AdapterConstructor and shutdown Profiling Server when received
 func MainWithClient(component string, ctor AdapterConstructor, ctx context.Context, kc kubernetes.Interface) {
-  log.Printf("Registering %d clients", len(injection.Default.GetClients()))
+	log.Printf("Registering %d clients", len(injection.Default.GetClients()))
 	log.Printf("Registering %d informer factories", len(injection.Default.GetInformerFactories()))
 	log.Printf("Registering %d informers", len(injection.Default.GetInformers()))
 
-  var err error
+	var err error
 
-  // We sometimes startup faster than we can reach kube-api. Poll on failure to prevent us terminating
+	// We sometimes startup faster than we can reach kube-api. Poll on failure to prevent us terminating
 	if perr := wait.PollImmediate(time.Second, 60*time.Second, func() (bool, error) {
-    err := version.CheckMinimumVersion(kc.Discovery())
+		err := version.CheckMinimumVersion(kc.Discovery())
 		if err != nil {
 			log.Printf("Failed to get k8s version %v", err)
 		}
@@ -101,37 +101,37 @@ func MainWithClient(component string, ctor AdapterConstructor, ctx context.Conte
 	}
 
 	// Set up our logger.
-  loggingConfig, err := GetLoggingConfig(kc)
+	loggingConfig, err := GetLoggingConfig(kc)
 	if err != nil {
 		log.Fatal("Error loading/parsing logging configuration: ", err)
 	}
-  logger, atomicLevel := pkglogging.NewLoggerFromConfig(loggingConfig, component)
+	logger, atomicLevel := pkglogging.NewLoggerFromConfig(loggingConfig, component)
 
 	logger = logger.With(zap.String(logkey.Name, component),
 		zap.String(logkey.Pod, os.Getenv(PodNameEnvKey)))
 	ctx = pkglogging.WithLogger(ctx, logger)
 	defer flush(logger)
 
-  profilingHandler := profiling.NewHandler(logger, false)
+	profilingHandler := profiling.NewHandler(logger, false)
 
-  configMapWatcher := configmap.NewInformedWatcher(kc, system.Namespace())
-  configMapWatcher.Watch(pkglogging.ConfigMapName(), pkglogging.UpdateLevelFromConfigMap(logger, atomicLevel, component))
-  configMapWatcher.Watch(metrics.ConfigMapName(),profilingHandler.UpdateFromConfigMap)
+	configMapWatcher := configmap.NewInformedWatcher(kc, system.Namespace())
+	configMapWatcher.Watch(pkglogging.ConfigMapName(), pkglogging.UpdateLevelFromConfigMap(logger, atomicLevel, component))
+	configMapWatcher.Watch(metrics.ConfigMapName(), profilingHandler.UpdateFromConfigMap)
 
-  if err = configMapWatcher.Start(ctx.Done()); err != nil {
-  	logger.Fatalw("Failed to start configuration manager", zap.Error(err))
-  }
+	if err = configMapWatcher.Start(ctx.Done()); err != nil {
+		logger.Fatalw("Failed to start configuration manager", zap.Error(err))
+	}
 
-  adapter := ctor(ctx)
+	adapter := ctor(ctx)
 
-  logger.Info("Starting Receive Adapter")
-  go adapter.Start(ctx.Done())
+	logger.Info("Starting Receive Adapter")
+	go adapter.Start(ctx.Done())
 
-  eg, egCtx := errgroup.WithContext(ctx)
-  profilingServer := profiling.NewServer(profilingHandler)
-  eg.Go(profilingServer.ListenAndServe)
+	eg, egCtx := errgroup.WithContext(ctx)
+	profilingServer := profiling.NewServer(profilingHandler)
+	eg.Go(profilingServer.ListenAndServe)
 
-  // This will block until either a signal arrives or one of the grouped functions
+	// This will block until either a signal arrives or one of the grouped functions
 	// returns an error.
 	<-egCtx.Done()
 
@@ -140,12 +140,12 @@ func MainWithClient(component string, ctor AdapterConstructor, ctx context.Conte
 	if err := eg.Wait(); err != nil && err != http.ErrServerClosed {
 		logger.Errorw("Error while running server", zap.Error(err))
 	} else {
-    logger.Info("Shutdowned Profiling Server")
-  }
+		logger.Info("Shutdowned Profiling Server")
+	}
 }
 
 func flush(logger *zap.SugaredLogger) {
 	logger.Sync()
-  os.Stdout.Sync()
+	os.Stdout.Sync()
 	os.Stderr.Sync()
 }

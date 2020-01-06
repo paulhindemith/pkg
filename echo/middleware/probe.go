@@ -20,25 +20,25 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/labstack/echo"
 	"knative.dev/serving/pkg/network"
-  "github.com/labstack/echo"
 )
 
 // K8sProbe returns a X-Request-ID middleware.
 func K8sProbe(phv string) echo.MiddlewareFunc {
-  return func(next echo.HandlerFunc) echo.HandlerFunc {
-    return func(c echo.Context) error {
-      // If this header is set the request was sent by hello-world component
-    	// probing the network, respond with a 200 and our component name.
-      if val := c.Request().Header.Get(network.ProbeHeaderName); val != "" {
-        if val != phv {
-          return &echo.HTTPError{
-      			Code:     http.StatusBadRequest,
-      			Message:  fmt.Sprintf("unexpected probe header value: %q", val),
-      		}
-    		}
-      }
-      return c.String(http.StatusOK, phv)
-    }
-  }
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			// If this header is set the request was sent by hello-world component
+			// probing the network, respond with a 200 and our component name.
+			if val := c.Request().Header.Get(network.ProbeHeaderName); val != "" {
+				if val != phv {
+					return &echo.HTTPError{
+						Code:    http.StatusBadRequest,
+						Message: fmt.Sprintf("unexpected probe header value: %q", val),
+					}
+				}
+			}
+			return c.String(http.StatusOK, phv)
+		}
+	}
 }

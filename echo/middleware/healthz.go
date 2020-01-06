@@ -19,16 +19,16 @@ package middleware
 import (
 	"net/http"
 
+	"github.com/labstack/echo"
 	"knative.dev/serving/pkg/network"
-  "github.com/labstack/echo"
 )
 
 type (
 	// K8sHealthzConfig defines the config for K8sHealthz middleware.
 	K8sHealthzConfig struct {
 		// Skipper defines a function to skip middleware.
-		Skipper func(echo.Context) bool
-    HealthCheck func() error
+		Skipper     func(echo.Context) bool
+		HealthCheck func() error
 	}
 )
 
@@ -36,9 +36,9 @@ var (
 	// DefaultK8sHealthzConfig is the default K8sHealthz middleware config.
 	DefaultK8sHealthzConfig = K8sHealthzConfig{
 		Skipper: func(c echo.Context) bool {
-      return !network.IsKubeletProbe(c.Request())
-    },
-    HealthCheck: func() error {return nil},
+			return !network.IsKubeletProbe(c.Request())
+		},
+		HealthCheck: func() error { return nil },
 	}
 )
 
@@ -49,27 +49,27 @@ func K8sHealthz() echo.MiddlewareFunc {
 
 // K8sHealthzWithConfig returns a X-Request-ID middleware with config.
 func K8sHealthzWithConfig(config K8sHealthzConfig) echo.MiddlewareFunc {
-  if config.Skipper == nil {
+	if config.Skipper == nil {
 		config.Skipper = DefaultK8sHealthzConfig.Skipper
 	}
-  if config.HealthCheck == nil {
+	if config.HealthCheck == nil {
 		config.HealthCheck = DefaultK8sHealthzConfig.HealthCheck
 	}
-  return func(next echo.HandlerFunc) echo.HandlerFunc {
-    return func(c echo.Context) error {
-      if config.Skipper(c) {
-  			return next(c)
-  		}
-      if err := config.HealthCheck(); err != nil {
-        // use zap.
-  			c.Logger().Warnf("Healthcheck failed: %v", err)
-        return &echo.HTTPError{
-    			Code:     http.StatusInternalServerError,
-    			Message:  err.Error(),
-    			Internal: err,
-    		}
-  		}
-      return c.String(http.StatusOK, "")
-    }
-  }
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if config.Skipper(c) {
+				return next(c)
+			}
+			if err := config.HealthCheck(); err != nil {
+				// use zap.
+				c.Logger().Warnf("Healthcheck failed: %v", err)
+				return &echo.HTTPError{
+					Code:     http.StatusInternalServerError,
+					Message:  err.Error(),
+					Internal: err,
+				}
+			}
+			return c.String(http.StatusOK, "")
+		}
+	}
 }
