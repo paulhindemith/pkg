@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Copyright 2018 The Knative Authors
 #
@@ -13,8 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Modifications Copyright 2020 Paulhindemith
+#
+# The original source code can be referenced from the link below.
+# https://github.com/knative/pkg/tree/4deb5d83d26170faeef8e54e9ae4cd9b04ed81f8/hack/verify-codegen.sh
+# The change history can be obtained by looking at the differences from the
+# following commit that added as the original source code.
+# 25b1b61dd5c1fb6ba1c84c58b00343db4304da3a
 
-set -o errexit
 set -o nounset
 set -o pipefail
 
@@ -35,10 +42,7 @@ mkdir -p "${TMP_DIFFROOT}"
 
 cp -aR \
   "${REPO_ROOT_DIR}/Gopkg.lock" \
-  "${REPO_ROOT_DIR}/apis" \
-  "${REPO_ROOT_DIR}/logging" \
-  "${REPO_ROOT_DIR}/metrics" \
-  "${REPO_ROOT_DIR}/testing" \
+  "${REPO_ROOT_DIR}/client" \
   "${TMP_DIFFROOT}"
 
 "${REPO_ROOT_DIR}/hack/update-codegen.sh"
@@ -49,31 +53,19 @@ diff -Naupr --no-dereference \
   "${REPO_ROOT_DIR}/Gopkg.lock" "${TMP_DIFFROOT}/Gopkg.lock" || ret=1
 
 diff -Naupr --no-dereference \
-  "${REPO_ROOT_DIR}/apis" "${TMP_DIFFROOT}/apis" || ret=1
-
-diff -Naupr --no-dereference \
-  "${REPO_ROOT_DIR}/logging" "${TMP_DIFFROOT}/logging" || ret=1
-
-diff -Naupr --no-dereference \
-  "${REPO_ROOT_DIR}/metrics" "${TMP_DIFFROOT}/metrics" || ret=1
-
-diff -Naupr --no-dereference \
-  "${REPO_ROOT_DIR}/testing" "${TMP_DIFFROOT}/testing" || ret=1
+  "${REPO_ROOT_DIR}/client" "${TMP_DIFFROOT}/client" || ret=1
 
 # Restore working tree state
 rm -fr \
   "${REPO_ROOT_DIR}/Gopkg.lock" \
-  "${REPO_ROOT_DIR}/apis" \
-  "${REPO_ROOT_DIR}/logging" \
-  "${REPO_ROOT_DIR}/metrics" \
-  "${REPO_ROOT_DIR}/testing"
+  "${REPO_ROOT_DIR}/client" \
 
 cp -aR "${TMP_DIFFROOT}"/* "${REPO_ROOT_DIR}"
 
 if [[ $ret -eq 0 ]]
 then
   echo "${REPO_ROOT_DIR} up to date."
- else
+else
   echo "${REPO_ROOT_DIR} is out of date. Please run hack/update-codegen.sh"
   exit 1
 fi

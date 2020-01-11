@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Copyright 2018 The Knative Authors
 #
@@ -13,56 +13,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Modifications Copyright 2020 Paulhindemith
+#
+# The original source code can be referenced from the link below.
+# https://github.com/knative/pkg/tree/4deb5d83d26170faeef8e54e9ae4cd9b04ed81f8/hack/update-codegen.sh
+# The change history can be obtained by looking at the differences from the
+# following commit that added as the original source code.
+# 25b1b61dd5c1fb6ba1c84c58b00343db4304da3a
 
-set -o errexit
 set -o nounset
 set -o pipefail
 
 source $(dirname $0)/../vendor/knative.dev/test-infra/scripts/library.sh
 
-CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${REPO_ROOT_DIR}; ls -d -1 $(dirname $0)/../vendor/k8s.io/code-generator 2>/dev/null || echo ../code-generator)}
-
-go install $(dirname $0)/../vendor/k8s.io/code-generator/cmd/deepcopy-gen
-
-# generate the code with:
-# --output-base    because this script should also be able to run inside the vendor dir of
-#                  k8s.io/kubernetes. The output-base is needed for the generators to output into the vendor dir
-#                  instead of the $GOPATH directly. For normal projects this can be dropped.
-
 # Knative Injection
-${REPO_ROOT_DIR}/hack/generate-knative.sh "injection" \
-  knative.dev/pkg/client knative.dev/pkg/apis \
+${REPO_ROOT_DIR}/vendor/knative.dev/pkg/hack/generate-knative.sh "injection" \
+  github.com/paulhindemith/pkg/client knative.dev/pkg/apis \
   "duck:v1alpha1,v1beta1,v1" \
-  --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
+  --go-header-file ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/boilerplate.go.txt
 
-OUTPUT_PKG="knative.dev/pkg/client/injection/kube" \
+OUTPUT_PKG="github.com/paulhindemith/pkg/client/injection/kube" \
 VERSIONED_CLIENTSET_PKG="k8s.io/client-go/kubernetes" \
 EXTERNAL_INFORMER_PKG="k8s.io/client-go/informers" \
-  ${REPO_ROOT_DIR}/hack/generate-knative.sh "injection" \
+  ${REPO_ROOT_DIR}/vendor/knative.dev/pkg/hack/generate-knative.sh "injection" \
     k8s.io/client-go \
     k8s.io/api \
     "admissionregistration:v1beta1 apps:v1 autoscaling:v1,v2beta1 batch:v1,v1beta1 core:v1 rbac:v1" \
-    --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
-
-OUTPUT_PKG="knative.dev/pkg/client/injection/apiextensions" \
-VERSIONED_CLIENTSET_PKG="k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset" \
-  ${REPO_ROOT_DIR}/hack/generate-knative.sh "injection" \
-    k8s.io/apiextensions-apiserver/pkg/client \
-    k8s.io/apiextensions-apiserver/pkg/apis \
-    "apiextensions:v1beta1" \
-    --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
-
-# Only deepcopy the Duck types, as they are not real resources.
-${CODEGEN_PKG}/generate-groups.sh "deepcopy" \
-  knative.dev/pkg/client knative.dev/pkg/apis \
-  "duck:v1alpha1,v1beta1,v1" \
-  --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
-
-# Depends on generate-groups.sh to install bin/deepcopy-gen
-${GOPATH}/bin/deepcopy-gen --input-dirs \
-  knative.dev/pkg/apis,knative.dev/pkg/tracker,knative.dev/pkg/logging,knative.dev/pkg/metrics,knative.dev/pkg/testing,knative.dev/pkg/testing/duck \
-  -O zz_generated.deepcopy \
-  --go-header-file ${REPO_ROOT_DIR}/hack/boilerplate/boilerplate.go.txt
+    --go-header-file ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/boilerplate.go.txt
 
 # Make sure our dependencies are up-to-date
 ${REPO_ROOT_DIR}/hack/update-deps.sh
