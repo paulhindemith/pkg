@@ -34,7 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/version"
 	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/kubernetes"
-	fakeclientset "k8s.io/client-go/kubernetes/fake"
+	fakeKubeclient "knative.dev/pkg/client/injection/kube/client/fake"
 	"knative.dev/pkg/signals"
 )
 
@@ -69,16 +69,18 @@ func updateConfigmap(name string, data map[string]string, kc kubernetes.Interfac
 	return err
 }
 
-func TestMainWithClient(t *testing.T) {
+func TestMainWithContext(t *testing.T) {
 	os.Setenv("SYSTEM_POD_NAME", "pn")
+	os.Setenv("SYSTEM_PROFILE_PORT", "8028")
+	os.Setenv("SYSTEM_LOGGING_CONFIG_MAP_NAME", "config-logging")
+	os.Setenv("SYSTEM_OBSERVABILITY_CONFIG_MAP_NAME", "config-observability")
+	os.Setenv("SYSTEM_KUBERNETES_MIN_VERSION", "v1.15.0")
+	// to use knative pkg
 	os.Setenv("SYSTEM_NAMESPACE", "ns")
-	os.Setenv("CONFIG_LOGGING_NAME", "config-logging")
-	os.Setenv("CONFIG_OBSERVABILITY_NAME", "config-observability")
-	os.Setenv("KUBERNETES_MIN_VERSION", "v1.15.0")
-	os.Setenv("KO_DATA_PATH", "../.git/")
+	// os.Setenv("KO_DATA_PATH", "../.git/")
 
 	ctx := signals.NewContext()
-	kubeClient := fakeclientset.NewSimpleClientset()
+	ctx, kubeClient := fakeKubeclient.With(ctx)
 	fakeDiscovery, _ := kubeClient.Discovery().(*fakediscovery.FakeDiscovery)
 	fakeDiscovery.FakedServerVersion = &version.Info{
 		GitVersion: "v1.15.0",
@@ -90,13 +92,12 @@ func TestMainWithClient(t *testing.T) {
 
 	ta := testAdapter{}
 
-	go MainWithClient(
+	go MainWithContext(
 		"mycomponent",
 		func(ctx context.Context) Adapter {
 			return &ta
 		},
 		ctx,
-		kubeClient,
 	)
 	eg := errgroup.Group{}
 	// ----------------------------------------------------------------------------
@@ -111,7 +112,7 @@ func TestMainWithClient(t *testing.T) {
 	// ----------------------------------------------------------------------------
 	// Profiling Server should have started.
 	// Ready for profiling request.
-	req, _ := http.NewRequest("GET", "http://localhost:8008/debug/pprof/heap", nil)
+	req, _ := http.NewRequest("GET", "http://localhost:8028/debug/pprof/heap", nil)
 	httpClient := http.Client{}
 	eg.Go(func() error {
 		return wait.PollImmediate(10*time.Millisecond, 5*time.Second, func() (bool, error) {

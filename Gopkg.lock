@@ -156,7 +156,7 @@
   version = "v1.3.2"
 
 [[projects]]
-  digest = "1:1d1cbf539d9ac35eb3148129f96be5537f1a1330cadcc7e3a83b4e72a59672a3"
+  digest = "1:bf40199583e5143d1472fc34d10d6f4b69d97572142acf343b3e43136da40823"
   name = "github.com/google/go-cmp"
   packages = [
     "cmp",
@@ -166,8 +166,7 @@
     "cmp/internal/value",
   ]
   pruneopts = "NUT"
-  revision = "2d0692c2e9617365a95b295612ac0d4415ba4627"
-  version = "v0.3.1"
+  revision = "6f77996f0c42f7b84e5a2b252227263f93432e9b"
 
 [[projects]]
   digest = "1:52c5834e2bebac9030c97cc0798ac11c3aa8a39f098aeb419f142533da6cd3cc"
@@ -217,6 +216,14 @@
   version = "v0.5.3"
 
 [[projects]]
+  digest = "1:7c47a990a91ab4922f4009c8ba8dcf35dad08e2b697cf26ea87eaae90e3f7aa1"
+  name = "github.com/imdario/mergo"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "1afb36080aec31e0d1528973ebe6721b191b0369"
+  version = "v0.3.8"
+
+[[projects]]
   digest = "1:1f2aebae7e7c856562355ec0198d8ca2fa222fb05e5b1b66632a1fce39631885"
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
@@ -230,6 +237,14 @@
   pruneopts = "NUT"
   revision = "acfec88f7a0d5140ace3dcdbee10184e3684a9e1"
   version = "v1.1.9"
+
+[[projects]]
+  digest = "1:08c58ac78a8c1f61e9a96350066d30fe194b8779799bd932a79932a5166a173f"
+  name = "github.com/kelseyhightower/envconfig"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "0b417c4ec4a8a82eecc22a1459a504aa55163d61"
+  version = "v1.4.0"
 
 [[projects]]
   branch = "master"
@@ -250,6 +265,14 @@
   pruneopts = "NUT"
   revision = "4919956f6fb227b548f004da27c7c6b20fba499f"
   version = "v0.3.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:0e9bfc47ab9941ecc3344e580baca5deb4091177e84dd9773b48b38ec26b93d5"
+  name = "github.com/mattbaird/jsonpatch"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "81af80346b1a01caae0cbc27fd3c1ba5b11e189f"
 
 [[projects]]
   digest = "1:bced2617aac935b7931d43bdd5fd5ef3eacbb52291c61e423afe8037f6dd95f9"
@@ -293,14 +316,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4e1f705e17d1964d6eb98752e421518912392a1034f9d7306e2241d3bbe15b1c"
+  digest = "1:181a682c008da24ba311c8c4204fa972b55e4b30815da3f78d291a2537e7bc47"
   name = "github.com/paulhindemith/dev-infra"
   packages = [
     "hack",
     "hack/boilerplate",
   ]
   pruneopts = "UT"
-  revision = "bfb86242550b290630ecf4632be9cb2c0eda78fd"
+  revision = "b9842f3f303872eb6404e031639b6b73463e9166"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
@@ -361,6 +384,14 @@
   pruneopts = "NUT"
   revision = "bf08ea5df4ea96c6460011b8a8ef2952494d458d"
   version = "v1.5.1"
+
+[[projects]]
+  digest = "1:d115708a27806831d1babbc6f28a7478ddf8e32a7095507c816e2515fb03a810"
+  name = "github.com/spf13/pflag"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "2e9d26c8c37aae03e3f9d4e90b7116f5accb7cab"
+  version = "v1.0.5"
 
 [[projects]]
   digest = "1:af354641f23332b1a8d5d361d11b5a9171589e412a67d499633706c611acc064"
@@ -557,7 +588,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:76bee8ca40c675fe4671faf0d1583a2ecca3ddfc4ac68325c31315e97725520f"
+  digest = "1:74b5608875930a90e0b014c84fa8e1995699576712c685c8033bb3bd8ded41a2"
   name = "golang.org/x/tools"
   packages = [
     "go/analysis",
@@ -571,8 +602,11 @@
     "go/packages",
     "go/types/objectpath",
     "go/types/typeutil",
+    "imports",
     "internal/fastwalk",
     "internal/gopathwalk",
+    "internal/imports",
+    "internal/module",
     "internal/semver",
   ]
   pruneopts = "NUT"
@@ -745,9 +779,10 @@
   version = "2019.2.3"
 
 [[projects]]
-  digest = "1:760e08df99c3c3b53764ef7c41c03ea9d90e8594d9df42364d9209e99a0352e1"
+  digest = "1:2b55f57d7b6d9f0f23478f2432b03273073f1bf93aed18620472e7117eb4451e"
   name = "k8s.io/api"
   packages = [
+    "admission/v1beta1",
     "admissionregistration/v1beta1",
     "apps/v1",
     "apps/v1beta1",
@@ -790,16 +825,18 @@
   version = "kubernetes-1.15.3"
 
 [[projects]]
-  digest = "1:87347ba01c0153bb8d676dc3f0262c1e736d49da39c84e60c719f62add92d3e8"
+  digest = "1:e47c9cc452f507b8be0fad9e7023205274823aeb848927d1880d9737ec2dab2d"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/equality",
     "pkg/api/errors",
     "pkg/api/meta",
     "pkg/api/resource",
+    "pkg/api/validation",
     "pkg/apis/meta/internalversion",
     "pkg/apis/meta/v1",
     "pkg/apis/meta/v1/unstructured",
+    "pkg/apis/meta/v1/validation",
     "pkg/apis/meta/v1beta1",
     "pkg/conversion",
     "pkg/conversion/queryparams",
@@ -842,11 +879,12 @@
   version = "kubernetes-1.15.3"
 
 [[projects]]
-  digest = "1:42aba8f77fcb5387b99a92cd977997b7d53bb326f7c3f356e76ee60e2bb6eb36"
+  digest = "1:183214fdb8319be809907e1e17e7a60a39390a1ab7c66e7bd76dedbc6153ee74"
   name = "k8s.io/client-go"
   packages = [
     "discovery",
     "discovery/fake",
+    "dynamic",
     "informers",
     "informers/admissionregistration",
     "informers/admissionregistration/v1beta1",
@@ -1013,8 +1051,12 @@
     "rest",
     "rest/watch",
     "testing",
+    "tools/auth",
     "tools/cache",
+    "tools/clientcmd",
     "tools/clientcmd/api",
+    "tools/clientcmd/api/latest",
+    "tools/clientcmd/api/v1",
     "tools/metrics",
     "tools/pager",
     "tools/record",
@@ -1024,6 +1066,7 @@
     "util/cert",
     "util/connrotation",
     "util/flowcontrol",
+    "util/homedir",
     "util/keyutil",
     "util/retry",
     "util/workqueue",
@@ -1031,6 +1074,42 @@
   pruneopts = "NUT"
   revision = "e14f31a72a77f7aa82a95eaf542d1194fb027d04"
   version = "kubernetes-1.15.3"
+
+[[projects]]
+  digest = "1:4367245b225e9f9e4006a5deae9fcae066b152a11802ad3f52a23cc626ffac88"
+  name = "k8s.io/code-generator"
+  packages = [
+    "cmd/client-gen",
+    "cmd/client-gen/args",
+    "cmd/client-gen/generators",
+    "cmd/client-gen/generators/fake",
+    "cmd/client-gen/generators/scheme",
+    "cmd/client-gen/generators/util",
+    "cmd/client-gen/path",
+    "cmd/client-gen/types",
+    "cmd/lister-gen",
+    "cmd/lister-gen/args",
+    "cmd/lister-gen/generators",
+    "pkg/namer",
+    "pkg/util",
+  ]
+  pruneopts = "NUT"
+  revision = "18da4a14b22b17d2fa761e50037fabfbacec225b"
+  version = "kubernetes-1.15.3"
+
+[[projects]]
+  branch = "master"
+  digest = "1:7f0be76bc4ca7cf9212b89a2e3f6c72c331e62212e0b06c19d774d1216e4639c"
+  name = "k8s.io/gengo"
+  packages = [
+    "args",
+    "generator",
+    "namer",
+    "parser",
+    "types",
+  ]
+  pruneopts = "NUT"
+  revision = "d8ecbaa43afd0cfa7a3370d5642b814840456eca"
 
 [[projects]]
   digest = "1:c0693cb981f43d82a767a3217b7640a4bdb341731d3814b38602f4e5dc4f01b3"
@@ -1062,15 +1141,27 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:df1a8dd8cb618bd4d7b1de3953fc98a8a147583ae7c898048fdd0f2ded424a77"
+  digest = "1:39b9c37fd5c6e531b1a2e740ab2ed2fbe237b3f142255fbd8ebae905a957d942"
   name = "knative.dev/pkg"
   packages = [
+    "apis",
+    "apis/duck",
+    "apis/duck/v1",
+    "apis/duck/v1alpha1",
+    "apis/duck/v1beta1",
     "changeset",
     "client/injection/kube/client",
+    "client/injection/kube/informers/factory",
+    "codegen/cmd/injection-gen",
+    "codegen/cmd/injection-gen/args",
+    "codegen/cmd/injection-gen/generators",
     "configmap",
     "controller",
     "injection",
+    "injection/clients/dynamicclient",
+    "injection/sharedmain",
     "kmeta",
+    "kmp",
     "logging",
     "logging/logkey",
     "metrics",
@@ -1078,9 +1169,12 @@
     "profiling",
     "signals",
     "system",
+    "tracker",
     "version",
+    "webhook",
+    "webhook/certificates/resources",
   ]
-  pruneopts = "NUT"
+  pruneopts = "T"
   revision = "169ef0797c1f7e548574e6aee289002c0f22dc0a"
 
 [[projects]]
@@ -1111,27 +1205,47 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/kelseyhightower/envconfig",
     "github.com/labstack/echo",
     "github.com/paulhindemith/dev-infra/hack",
     "github.com/paulhindemith/dev-infra/hack/boilerplate",
+    "github.com/rogpeppe/go-internal/semver",
     "go.uber.org/zap",
     "golang.org/x/sync/errgroup",
     "k8s.io/api/core/v1",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
+    "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/util/wait",
     "k8s.io/apimachinery/pkg/version",
     "k8s.io/client-go/discovery/fake",
+    "k8s.io/client-go/informers",
+    "k8s.io/client-go/informers/admissionregistration/v1beta1",
+    "k8s.io/client-go/informers/apps/v1",
+    "k8s.io/client-go/informers/autoscaling/v1",
+    "k8s.io/client-go/informers/autoscaling/v2beta1",
+    "k8s.io/client-go/informers/batch/v1",
+    "k8s.io/client-go/informers/batch/v1beta1",
+    "k8s.io/client-go/informers/core/v1",
+    "k8s.io/client-go/informers/rbac/v1",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/kubernetes/fake",
-    "knative.dev/pkg/client/injection/kube/client",
+    "k8s.io/client-go/rest",
+    "k8s.io/code-generator/cmd/client-gen",
+    "k8s.io/code-generator/cmd/lister-gen",
+    "knative.dev/pkg/apis/duck",
+    "knative.dev/pkg/apis/duck/v1",
+    "knative.dev/pkg/apis/duck/v1alpha1",
+    "knative.dev/pkg/apis/duck/v1beta1",
+    "knative.dev/pkg/codegen/cmd/injection-gen",
     "knative.dev/pkg/configmap",
+    "knative.dev/pkg/controller",
     "knative.dev/pkg/injection",
+    "knative.dev/pkg/injection/clients/dynamicclient",
+    "knative.dev/pkg/injection/sharedmain",
     "knative.dev/pkg/logging",
-    "knative.dev/pkg/metrics",
     "knative.dev/pkg/profiling",
     "knative.dev/pkg/signals",
     "knative.dev/pkg/system",
-    "knative.dev/pkg/version",
     "knative.dev/serving/pkg/network",
     "knative.dev/test-infra/scripts",
   ]

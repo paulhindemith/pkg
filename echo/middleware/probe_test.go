@@ -22,16 +22,16 @@ import (
 	"testing"
 
 	"github.com/labstack/echo"
-	"knative.dev/serving/pkg/network"
 )
 
 func TestProbeMiddleware(t *testing.T) {
 	// Setup
-	probeHeaderValue := "test"
+	probeHeader := "hello"
+	probeHeaderValue := "world"
 	e := echo.New()
-	e.Use(K8sProbe(probeHeaderValue))
+	e.Use(K8sProbe(probeHeader, probeHeaderValue))
 	req := httptest.NewRequest("GET", "/healthz", nil)
-	req.Header.Set(network.ProbeHeaderName, probeHeaderValue)
+	req.Header.Set(probeHeader, probeHeaderValue)
 	rec := httptest.NewRecorder()
 
 	e.ServeHTTP(rec, req)

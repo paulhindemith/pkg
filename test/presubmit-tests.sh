@@ -14,6 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.export DISABLE_MD_LINTING=1
 
+set -o errexit
+PRESUBMIT_TEST_FAIL_FAST=1
+
 source $(dirname $0)/../vendor/knative.dev/test-infra/scripts/presubmit-tests.sh
 
-main $@
+echo ">> ./vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh"
+./vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh Paulhindemith
+
+echo ">> go fmt ./..."
+go fmt ./...
+
+echo ">> go vet ./..."
+go vet ./...
+
+main --build-tests --unit-tests

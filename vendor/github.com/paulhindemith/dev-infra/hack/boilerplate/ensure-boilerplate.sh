@@ -44,12 +44,13 @@ function ensure_boilerplate() {
 
 function main() {
   local target_files
-  target_files="$(find ${ROOT_DIR} -type f -name "*.sh" -o -name "*.go" | grep -v vendor)" || exit 1
+  target_files="$(find ${ROOT_DIR} -type f -name "*.sh" -o -name "*.go" -o -name "*.yaml" | grep -v "/vendor/")" || exit 1
 
   for fi in $(echo $target_files); do
     case "$fi" in
       *.go ) ensure_boilerplate go ${fi} $1 ;;
       *.sh ) ensure_boilerplate sh ${fi} $1 ;;
+      *.yaml ) ensure_boilerplate yaml ${fi} $1 ;;
       * ) exit 1 ;;
     esac
   done

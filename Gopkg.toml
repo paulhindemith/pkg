@@ -2,6 +2,9 @@ required = [
 "github.com/paulhindemith/dev-infra/hack",
 "github.com/paulhindemith/dev-infra/hack/boilerplate",
 "knative.dev/test-infra/scripts",
+"k8s.io/code-generator/cmd/client-gen",
+"k8s.io/code-generator/cmd/lister-gen",
+"knative.dev/pkg/codegen/cmd/injection-gen",
 ]
 
 [[constraint]]
@@ -21,3 +24,8 @@ required = [
 [[prune.project]]
   name = "knative.dev/test-infra"
   non-go = false
+
+[[prune.project]]
+  name = "knative.dev/pkg"
+  non-go = false
+  unused-packages = false
