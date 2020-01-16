@@ -1,10 +1,10 @@
 required = [
 "github.com/paulhindemith/dev-infra/hack",
 "github.com/paulhindemith/dev-infra/hack/boilerplate",
+"github.com/paulhindemith/dev-infra/third_party/cert-manager/cert-manager-0.12.0",
+"github.com/paulhindemith/dev-infra/third_party/istio/istio-1.4.2",
+"github.com/paulhindemith/dev-infra/third_party/knative/knative-0.11.1",
 "knative.dev/test-infra/scripts",
-"k8s.io/code-generator/cmd/client-gen",
-"k8s.io/code-generator/cmd/lister-gen",
-"knative.dev/pkg/codegen/cmd/injection-gen",
 ]
 
 [[constraint]]

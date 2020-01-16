@@ -16,52 +16,51 @@ limitations under the License.
 package metricstest
 
 import (
-	"reflect"
+	"testing"
 
 	"go.opencensus.io/stats/view"
-	"knative.dev/pkg/test"
 )
 
 // CheckStatsReported checks that there is a view registered with the given name for each string in names,
 // and that each view has at least one record.
-func CheckStatsReported(t test.T, names ...string) {
+func CheckStatsReported(t *testing.T, names ...string) {
 	t.Helper()
 	for _, name := range names {
 		d, err := view.RetrieveData(name)
 		if err != nil {
-			t.Error("For metric, Reporter.Report() error", "metric", name, "error", err)
+			t.Errorf("For metric %s: Reporter.Report() error = %v", name, err)
 		}
 		if len(d) < 1 {
-			t.Error("For metric, no data reported when data was expected, view data is empty.", "metric", name)
+			t.Errorf("For metric %s: No data reported when data was expected, view data is empty.", name)
 		}
 	}
 }
 
 // CheckStatsNotReported checks that there are no records for any views that a name matching a string in names.
 // Names that do not match registered views are considered not reported.
-func CheckStatsNotReported(t test.T, names ...string) {
+func CheckStatsNotReported(t *testing.T, names ...string) {
 	t.Helper()
 	for _, name := range names {
 		d, err := view.RetrieveData(name)
 		// err == nil means a valid stat exists matching "name"
 		// len(d) > 0 means a component recorded metrics for that stat
 		if err == nil && len(d) > 0 {
-			t.Error("For metric, unexpected data reported when no data was expected.", "metric", name, "Reporter len(d)", len(d))
+			t.Errorf("For metric %s: Unexpected data reported when no data was expected. Reporter len(d) = %d", name, len(d))
 		}
 	}
 }
 
 // CheckCountData checks the view with a name matching string name to verify that the CountData stats
 // reported are tagged with the tags in wantTags and that wantValue matches reported count.
-func CheckCountData(t test.T, name string, wantTags map[string]string, wantValue int64) {
+func CheckCountData(t *testing.T, name string, wantTags map[string]string, wantValue int64) {
 	t.Helper()
 	if row := checkExactlyOneRow(t, name); row != nil {
 		checkRowTags(t, row, name, wantTags)
 
 		if s, ok := row.Data.(*view.CountData); !ok {
-			t.Error("want CountData", "metric", name, "got", reflect.TypeOf(row.Data))
+			t.Errorf("%s: got %T, want CountData", name, row.Data)
 		} else if s.Value != wantValue {
-			t.Error("Wrong value", "metric", name, "value", s.Value, "want", wantValue)
+			t.Errorf("For metric %s: value = %v, want: %d", name, s.Value, wantValue)
 		}
 	}
 }
@@ -69,22 +68,22 @@ func CheckCountData(t test.T, name string, wantTags map[string]string, wantValue
 // CheckDistributionData checks the view with a name matching string name to verify that the DistributionData stats reported
 // are tagged with the tags in wantTags and that expectedCount number of records were reported.
 // It also checks that expectedMin and expectedMax match the minimum and maximum reported values, respectively.
-func CheckDistributionData(t test.T, name string, wantTags map[string]string, expectedCount int64, expectedMin float64, expectedMax float64) {
+func CheckDistributionData(t *testing.T, name string, wantTags map[string]string, expectedCount int64, expectedMin float64, expectedMax float64) {
 	t.Helper()
 	if row := checkExactlyOneRow(t, name); row != nil {
 		checkRowTags(t, row, name, wantTags)
 
 		if s, ok := row.Data.(*view.DistributionData); !ok {
-			t.Error("want DistributionData", "metric", name, "got", reflect.TypeOf(row.Data))
+			t.Errorf("%s: got %T, want DistributionData", name, row.Data)
 		} else {
 			if s.Count != expectedCount {
-				t.Error("reporter count wrong", "metric", name, "got", s.Count, "want", expectedCount)
+				t.Errorf("For metric %s: reporter count = %d, want = %d", name, s.Count, expectedCount)
 			}
 			if s.Min != expectedMin {
-				t.Error("reporter count wrong", "metric", name, "got", s.Min, "want", expectedMin)
+				t.Errorf("For metric %s: reporter count = %f, want = %f", name, s.Min, expectedMin)
 			}
 			if s.Max != expectedMax {
-				t.Error("reporter count wrong", "metric", name, "got", s.Max, "want", expectedMax)
+				t.Errorf("For metric %s: reporter count = %f, want = %f", name, s.Max, expectedMax)
 			}
 		}
 	}
@@ -92,30 +91,30 @@ func CheckDistributionData(t test.T, name string, wantTags map[string]string, ex
 
 // CheckLastValueData checks the view with a name matching string name to verify that the LastValueData stats
 // reported are tagged with the tags in wantTags and that wantValue matches reported last value.
-func CheckLastValueData(t test.T, name string, wantTags map[string]string, wantValue float64) {
+func CheckLastValueData(t *testing.T, name string, wantTags map[string]string, wantValue float64) {
 	t.Helper()
 	if row := checkExactlyOneRow(t, name); row != nil {
 		checkRowTags(t, row, name, wantTags)
 
 		if s, ok := row.Data.(*view.LastValueData); !ok {
-			t.Error("want LastValueData", "metric", name, "got", reflect.TypeOf(row.Data))
+			t.Errorf("%s: got %T, want LastValueData", name, row.Data)
 		} else if s.Value != wantValue {
-			t.Error("Reporter.Report() wrong value", "metric", name, "got", s.Value, "want", wantValue)
+			t.Errorf("For metric %s: Reporter.Report() expected %v got %v", name, s.Value, wantValue)
 		}
 	}
 }
 
 // CheckSumData checks the view with a name matching string name to verify that the SumData stats
 // reported are tagged with the tags in wantTags and that wantValue matches the reported sum.
-func CheckSumData(t test.T, name string, wantTags map[string]string, wantValue float64) {
+func CheckSumData(t *testing.T, name string, wantTags map[string]string, wantValue float64) {
 	t.Helper()
 	if row := checkExactlyOneRow(t, name); row != nil {
 		checkRowTags(t, row, name, wantTags)
 
 		if s, ok := row.Data.(*view.SumData); !ok {
-			t.Error("Wrong type", "metric", name, "got", reflect.TypeOf(row.Data), "want", "SumData")
+			t.Errorf("%s: got %T, want SumData", name, row.Data)
 		} else if s.Value != wantValue {
-			t.Error("Wrong sumdata", "metric", name, "got", s.Value, "want", wantValue)
+			t.Errorf("For metric %s: value = %v, want: %v", name, s.Value, wantValue)
 		}
 	}
 }
@@ -135,32 +134,32 @@ func Unregister(names ...string) {
 	}
 }
 
-func checkExactlyOneRow(t test.T, name string) *view.Row {
+func checkExactlyOneRow(t *testing.T, name string) *view.Row {
 	t.Helper()
 	d, err := view.RetrieveData(name)
 	if err != nil {
-		t.Error("Reporter.Report() error", "metric", name, "error", err)
+		t.Errorf("For metric %s: Reporter.Report() error = %v", name, err)
 		return nil
 	}
 	if len(d) != 1 {
-		t.Error("Reporter.Report() wrong length", "metric", name, "got", len(d), "want", 1)
+		t.Errorf("For metric %s: Reporter.Report() len(d)=%v, want 1", name, len(d))
 		return nil
 	}
 
 	return d[0]
 }
 
-func checkRowTags(t test.T, row *view.Row, name string, wantTags map[string]string) {
+func checkRowTags(t *testing.T, row *view.Row, name string, wantTags map[string]string) {
 	t.Helper()
 	if wantlen, gotlen := len(wantTags), len(row.Tags); gotlen != wantlen {
-		t.Error("Reporter got wrong number of tags", "metric", name, "got", gotlen, "want", wantlen)
+		t.Errorf("For metric %s: Reporter got %v tags while want %v", name, gotlen, wantlen)
 	}
 	for _, got := range row.Tags {
 		n := got.Key.Name()
 		if want, ok := wantTags[n]; !ok {
-			t.Error("Reporter got an extra tag", "metric", name, "gotName", n, "gotValue", got.Value)
+			t.Errorf("For metric %s: Reporter got an extra tag %v: %v", name, n, got.Value)
 		} else if got.Value != want {
-			t.Error("Reporter expected a different tag value for key", "metric", name, "key", n, "got", got.Value, "want", want)
+			t.Errorf("For metric %s: Reporter expected a different tag value for key: %s, got: %s, want: %s", name, n, got.Value, want)
 		}
 	}
 }

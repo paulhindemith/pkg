@@ -23,11 +23,8 @@
 # 3134142ea564ebffd087ad5b4bf7b96e4e60191a
 
 readonly ROOT_DIR=$(git rev-parse --show-toplevel)
-source ${ROOT_DIR}/vendor/knative.dev/test-infra/scripts/library.sh
 
 set -o errexit
-set -o nounset
-set -o pipefail
 
 cd ${ROOT_DIR}
 
@@ -36,5 +33,3 @@ dep ensure $@
 
 rm -rf $(find vendor/ -name 'OWNERS')
 rm -rf $(find vendor/ -name '*_test.go')
-
-remove_broken_symlinks ./vendor

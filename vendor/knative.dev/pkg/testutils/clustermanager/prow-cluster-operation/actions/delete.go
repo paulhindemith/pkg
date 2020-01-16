@@ -17,15 +17,13 @@ limitations under the License.
 package actions
 
 import (
-	"fmt"
 	"log"
 
 	clm "knative.dev/pkg/testutils/clustermanager/e2e-tests"
 	"knative.dev/pkg/testutils/clustermanager/prow-cluster-operation/options"
 )
 
-// Delete deletes a GKE cluster
-func Delete(o *options.RequestWrapper) error {
+func Delete(o *options.RequestWrapper) {
 	o.Request.NeedsCleanup = true
 	o.Request.SkipCreation = true
 
@@ -33,12 +31,12 @@ func Delete(o *options.RequestWrapper) error {
 	clusterOps := gkeClient.Setup(o.Request)
 	gkeOps := clusterOps.(*clm.GKECluster)
 	if err := gkeOps.Acquire(); err != nil || gkeOps.Cluster == nil {
-		return fmt.Errorf("failed identifying cluster for cleanup: '%v'", err)
+		log.Fatalf("Failed identifying cluster for cleanup: '%v'", err)
 	}
 	log.Printf("Identified project %q and cluster %q for removal", gkeOps.Project, gkeOps.Cluster.Name)
 	var err error
 	if err = gkeOps.Delete(); err != nil {
-		return fmt.Errorf("failed deleting cluster: '%v'", err)
+		log.Fatalf("Failed deleting cluster: '%v'", err)
 	}
 	// TODO: uncomment the lines below when previous Delete command becomes
 	// async operation
@@ -49,6 +47,4 @@ func Delete(o *options.RequestWrapper) error {
 	// if out, err := common.StandardExec("kubectl", "config", "unset", "current-context"); err != nil {
 	// 	common.StandardExec("kubectl", "config", "unset", "contexts."+string(out))
 	// }
-
-	return nil
 }

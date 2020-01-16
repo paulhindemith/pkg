@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Copyright 2018 The Knative Authors
 #
@@ -13,30 +13,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Modifications Copyright 2020 Paulhindemith
+#
+# The original source code can be referenced from the link below.
+# https://github.com/knative/serving/tree/1957dff9cea156d158cfaa2fde3c6de76dfe6de1/test/e2e-tests.sh
+# The change history can be obtained by looking at the differences from the
+# following commit that added as the original source code.
+# b65b5ef3737a22497b2358b08ec8c91556c23a0d
 
-# This script runs the end-to-end tests against Knative Serving built from source.
-# It is started by prow for each PR. For convenience, it can also be executed manually.
+REPO_ROOT_DIR=$(git rev-parse --show-toplevel)
+readonly TEST_NAMESPACE="hello-world"
+readonly E2E_KIND_CONFIG_PATH="${REPO_ROOT_DIR}/conformance/hello-world-serving/test/kind-config.yaml"
+readonly TEST_CONFIG_DIR="${REPO_ROOT_DIR}/conformance/hello-world-serving/test/config"
+readonly E2E_CLUSTER_VERSION="1.17.0"
 
-# If you already have a Knative cluster setup and kubectl pointing
-# to it, call this script with the --run-tests arguments and it will use
-# the cluster and run the tests.
+source ${REPO_ROOT_DIR}/scripts/e2e-common.sh
 
-# Calling this script without arguments will create a new cluster in
-# project $PROJECT_ID, start knative in it, run the tests and delete the
-# cluster.
-
-source $(dirname $0)/e2e-common.sh
-
-# Helper functions.
 
 function knative_setup() {
   install_knative_serving
 }
 
+function post_test_setup() {
+  echo $(dirname $0)/config
+  ko apply -f ${REPO_ROOT_DIR}/conformance/hello-world-serving/config
+}
+
 # Script entry point.
 
-# Skip installing istio as an add-on
-initialize $@ --skip-istio-addon
+initialize $@
 
 # Run the tests
 header "Running tests"
@@ -47,26 +53,20 @@ failed=0
 parallelism=""
 (( MESH )) && parallelism="-parallel 1"
 
-# Run conformance and e2e tests.
-go_test_e2e -timeout=30m \
-  ./test/conformance/... \
-  ./test/e2e \
-  ${parallelism} \
-  "--resolvabledomain=$(use_resolvable_domain)" "$(use_https)" "$(ingress_class)" || failed=1
-
-# Run scale tests.
-go_test_e2e -timeout=10m \
-  ${parallelism} \
-  ./test/scale || failed=1
-
-# Istio E2E tests mutate the cluster and must be ran separately
-if [[ -n "${ISTIO_VERSION}" ]]; then
-  go_test_e2e -timeout=10m \
-    ./test/e2e/istio \
-    "--resolvabledomain=$(use_resolvable_domain)" "$(use_https)" || failed=1
+# Run tests local
+e2e_args=""
+if [[ ${TEST_ENV}="local" ]]; then
+  e2e_args+=" --kubeconfig $(get_canonical_path "${HOME}/.kube/kind-config-kind-kubetest")"
+  e2e_args+=" --ingressendpoint localhost"
 fi
 
-# Dump cluster state in case of failure
+# Run conformance and e2e tests.
+go_test_e2e -timeout=30m \
+  "${REPO_ROOT_DIR}/conformance/hello-world-serving/test/e2e" \
+  ${parallelism} \
+  ${e2e_args} \
+  "$(use_https)" || failed=1
+
 (( failed )) && dump_cluster_state
 (( failed )) && fail_test
 

@@ -34,8 +34,9 @@ func K8sProbe(h string, v string) echo.MiddlewareFunc {
 						Message: fmt.Sprintf("unexpected probe header value: %q", val),
 					}
 				}
+				return c.String(http.StatusOK, v)
 			}
-			return c.String(http.StatusOK, v)
+			return next(c)
 		}
 	}
 }

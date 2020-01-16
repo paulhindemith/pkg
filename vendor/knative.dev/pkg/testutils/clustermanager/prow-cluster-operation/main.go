@@ -17,7 +17,6 @@ limitations under the License.
 package main
 
 import (
-	"errors"
 	"flag"
 	"log"
 
@@ -32,8 +31,6 @@ var (
 )
 
 func main() {
-	var err error
-
 	flag.BoolVar(&create, "create", false, "Create cluster")
 	flag.BoolVar(&delete, "delete", false, "Delete cluster")
 	flag.BoolVar(&get, "get", false, "Get existing cluster from kubeconfig or gcloud")
@@ -45,16 +42,12 @@ func main() {
 	}
 	switch {
 	case create:
-		err = actions.Create(o)
+		actions.Create(o)
 	case delete:
-		err = actions.Delete(o)
+		actions.Delete(o)
 	case get:
-		err = actions.Get(o)
+		actions.Get(o)
 	default:
-		err = errors.New("Must pass one of --create, --delete, --get")
-	}
-
-	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Must pass one of --create, --delete, --get")
 	}
 }
