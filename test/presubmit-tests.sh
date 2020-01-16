@@ -16,16 +16,24 @@
 
 set -o errexit
 PRESUBMIT_TEST_FAIL_FAST=1
+IS_DOCKER_HOST=$(which docker > /dev/null && echo 1 || echo 0)
 
 source $(dirname $0)/../vendor/knative.dev/test-infra/scripts/presubmit-tests.sh
 
-echo ">> ./vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh"
-./vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh Paulhindemith
+if [[ ${TEST_ENV}="local" ]]; then
+  if (( ! IS_DOCKER_HOST )); then
+    echo ">> ./vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh"
+    $(dirname $0)/../vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh Paulhindemith
 
-echo ">> go fmt ./..."
-go fmt ./...
+    echo ">> go fmt ./..."
+    go fmt ./...
 
-echo ">> go vet ./..."
-go vet ./...
+    echo ">> go vet ./..."
+    go vet ./...
 
-main $@
+    main --build-tests --unit-tests
+  fi
+fi
+
+echo ">> ${REPO_ROOT_DIR}/conformance/hello-world-serving/test/presubmit-tests.sh"
+${REPO_ROOT_DIR}/conformance/hello-world-serving/test/presubmit-tests.sh

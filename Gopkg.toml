@@ -9,8 +9,16 @@ required = [
 
 [[constraint]]
   name = "github.com/labstack/echo"
-  branch = "master"
+  version = "v4.1.13"
   source = "https://github.com/labstack/echo.git"
+
+[[override]]
+  name = "knative.dev/pkg"
+  branch = "release-0.11"
+
+[[override]]
+  name = "knative.dev/serving"
+  branch = "release-0.11"
 
 [prune]
   go-tests = true
@@ -24,8 +32,3 @@ required = [
 [[prune.project]]
   name = "knative.dev/test-infra"
   non-go = false
-
-[[prune.project]]
-  name = "knative.dev/pkg"
-  non-go = false
-  unused-packages = false

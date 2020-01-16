@@ -275,13 +275,13 @@
   version = "v1.4.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:d2359ebb507f26d6eccb430153a1ed3ac21712bd66857bc712612aad16995e23"
+  digest = "1:3f8af2fa039303b8afabe9744438687e49af92616e0c892a39ef2eb13de5105a"
   name = "github.com/labstack/echo"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "399da56370c28c1788b9c61e0e55ab82be59fac1"
+  revision = "5793765eedc2207d2a777ae23be11b2f3ba862f2"
   source = "https://github.com/labstack/echo.git"
+  version = "v4.1.13"
 
 [[projects]]
   digest = "1:e9cb57fc3c5d6c53e190eee739dbe0c778e27be9039d0b60d9c9bf6993e8b8b6"
@@ -501,7 +501,7 @@
   revision = "2cfd321de3ee5d5f8a5fda2521d1703478334d98"
 
 [[projects]]
-  digest = "1:94b2c0ce9cbf81b32d0fb28057382fe65e96256734edacff926bca6882c531f3"
+  digest = "1:85674ac609b704fd4e9f463553b6ffc3a3527a993ae0ba550eb56beaabdfe094"
   name = "go.uber.org/zap"
   packages = [
     ".",
@@ -512,8 +512,7 @@
     "zapcore",
   ]
   pruneopts = "NUT"
-  revision = "33e58d4d0120aa28d4df84cd244838c490846c9d"
-  version = "v1.13.0"
+  revision = "67bc79d13d155c02fd008f721863ff8cc5f30659"
 
 [[projects]]
   branch = "master"
@@ -688,8 +687,7 @@
   version = "v1.6.5"
 
 [[projects]]
-  branch = "master"
-  digest = "1:c21ea6f419a93a0d98aee5083cedbcbe1ca43aa0da73a5f3c7568c1dc926c1bf"
+  digest = "1:3689f4cc57cc55b4631efc4b778c47d2a888a7060b4108f42cf289a2033be5ba"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api",
@@ -702,11 +700,10 @@
     "googleapis/devtools/cloudtrace/v2",
     "googleapis/monitoring/v3",
     "googleapis/rpc/status",
-    "googleapis/type/calendarperiod",
     "protobuf/field_mask",
   ]
   pruneopts = "NUT"
-  revision = "e1de0a7b01eb2fc11d735e4bfb79d2e53ec9edb3"
+  revision = "357c62f0e4bbba7e6cc403ae09edcf3e2b9028fe"
 
 [[projects]]
   digest = "1:81fc76a3a29cafb597e19c2016c278f0ffa44c98893de090ec0c924643c68918"
@@ -1148,12 +1145,11 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:42674e29bf0cf4662d49bd9528e24b9ecc4895b32d0be281f9cf04d3a7671846"
+  digest = "1:03a96603922fc1f6895ae083e1e16d943b55ef0656b56965351bd87e7d90485f"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/util/proto"]
   pruneopts = "NUT"
-  revision = "30be4d16710ac61bce31eb28a01054596fe6a9f1"
+  revision = "b3a7cee44a305be0a69e1b9ac03018307287e1b0"
 
 [[projects]]
   branch = "master"
@@ -1169,7 +1165,7 @@
 
 [[projects]]
   branch = "release-0.11"
-  digest = "1:417e10b1fd4de25871d5c99175b845ad8a762114cc5a5d27cd6a2999a49ffd58"
+  digest = "1:27c8ec7796c49df62d607435ee9b323feb00e324c21348b070dfbf1dc299f8c9"
   name = "knative.dev/pkg"
   packages = [
     "apis",
@@ -1211,10 +1207,11 @@
     "webhook",
     "webhook/certificates/resources",
   ]
-  pruneopts = "T"
+  pruneopts = "NUT"
   revision = "cf220a867b3d312155c0e2be3efe10b1f3dc182d"
 
 [[projects]]
+  branch = "release-0.11"
   digest = "1:403578faaa265b69a08788252861c92ed56b452f5d129637207ec1ff70239bee"
   name = "knative.dev/serving"
   packages = [
@@ -1245,15 +1242,14 @@
   ]
   pruneopts = "NUT"
   revision = "6b0e5c628deb43d56f9b0c5237e97562b6ca587f"
-  version = "v0.11.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:c41ef8736a012d015872fee1162c014992cfc9c744d87a7c74fd4a2e9e7c6a5b"
+  digest = "1:cb8455df9d257ced74573772c0748985781decf5f70adc26de70744f54c633f4"
   name = "knative.dev/test-infra"
   packages = ["scripts"]
   pruneopts = "UT"
-  revision = "9160fc2ec95a53f62b8cac045045ba59864f823f"
+  revision = "d5990f0e5a05d5819a40ad3b4de6227406850b48"
 
 [[projects]]
   digest = "1:8730e0150dfb2b7e173890c8b9868e7a273082ef8e39f4940e3506a481cf895c"
@@ -1294,7 +1290,6 @@
     "knative.dev/pkg/system",
     "knative.dev/pkg/test",
     "knative.dev/serving/pkg/network",
-    "knative.dev/serving/pkg/testing/v1",
     "knative.dev/serving/test",
     "knative.dev/serving/test/v1",
     "knative.dev/test-infra/scripts",

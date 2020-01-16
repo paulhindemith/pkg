@@ -25,10 +25,10 @@ c3bf5f353a7875a2ce2d083a190dffd5872a48a4
 package e2e
 
 import (
-  "testing"
+	"testing"
 
-  "knative.dev/serving/test"
-  pkgTest "knative.dev/pkg/test"
+	pkgTest "knative.dev/pkg/test"
+	"knative.dev/serving/test"
 )
 
 // Setup creates the client objects needed in the e2e tests.

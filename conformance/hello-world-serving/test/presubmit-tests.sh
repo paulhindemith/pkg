@@ -24,15 +24,18 @@ if [[ ${TEST_ENV}="local" ]]; then
   if (( IS_DOCKER_HOST )); then
     main --integration-tests
   else
-    echo ">> cd $(dirname $0)/../"
-    cd $(dirname $0)/../
-
-    echo ">> ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh"
-    ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh Paulhindemith
-
-    echo ">> go fmt ./..."
-    go fmt ./...
-
+    echo ">> cd ${REPO_ROOT_DIR}"
+    cd ${REPO_ROOT_DIR}
+    #
+    # echo ">> ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh"
+    # ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh Paulhindemith
+    #
+    # echo ">> ${REPO_ROOT_DIR}/conformance/hello-world-serving/hack/update-deps.sh"
+    # ${REPO_ROOT_DIR}/conformance/hello-world-serving/hack/update-deps.sh
+    #
+    # echo ">> go fmt ./..."
+    # go fmt ./...
+    #
     echo ">> go vet ./..."
     go vet ./...
 

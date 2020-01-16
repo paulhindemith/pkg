@@ -32,9 +32,11 @@ set -o pipefail
 cd ${REPO_ROOT_DIR}
 
 # Ensure we have everything we need under vendor/
-dep ensure $@
+echo ">> dep ensure"
+dep ensure
 
 rm -rf $(find vendor/ -name 'OWNERS')
 rm -rf $(find vendor/ -name '*_test.go')
 
+echo ">> update_licenses"
 update_licenses conformance/hello-world-serving/third_party/VENDOR-LICENSE "./conformance/hello-world-serving/cmd/*"
