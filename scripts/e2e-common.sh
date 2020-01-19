@@ -65,11 +65,6 @@ function parse_flags() {
       readonly TEST_NAMESPACE=$2
       return 2
       ;;
-    --kind-kubeconfig)
-      readonly E2E_KIND_KUBE_CONFIG=$(get_canonical_path $2)
-      readonly TEST_ENV="local"
-      return 2
-      ;;
     --dockerconfigjson)
       readonly DOCKER_CONFIG_FILE=$2
       return 2
@@ -167,7 +162,7 @@ data:
   ingress.class: "istio.ingress.networking.knative.dev"
 EOF
 
-  echo ">> Turning on profiling.enable"
+  echo ">> Turning on prometheus"
   cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
@@ -175,7 +170,8 @@ metadata:
   name: config-observability
   namespace: knative-serving
 data:
-  profiling.enable: "true"
+  profiling.enable: "false"
+  metrics.request-metrics-backend-destination: prometheus
 EOF
 
   echo ">> Patching activator HPA"

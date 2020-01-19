@@ -32,3 +32,9 @@ required = [
 [[prune.project]]
   name = "knative.dev/test-infra"
   non-go = false
+
+# Recent version occurs unknown error.
+# Decided to match the version knative.dev/pkg.
+[[override]]
+  name = "cloud.google.com/go"
+  version = "v0.41.0"

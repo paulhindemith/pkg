@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:1a3a940ab130a991ab4c2db91179b3bbff2e587351d497a5a9d5b7722072aba5"
+  digest = "1:5f43842d8fe08b43ada82d57e48a844800b4163d1150f7f451e81cb347fccb72"
   name = "cloud.google.com/go"
   packages = [
     "compute/metadata",
@@ -12,8 +12,8 @@
     "trace/apiv2",
   ]
   pruneopts = "NUT"
-  revision = "b4cdc8d6eb508c4e74df26094d1adb678c87f818"
-  version = "v0.51.0"
+  revision = "cf81fad90a1a1de334c4fc27e23eb9a4224b627a"
+  version = "v0.41.0"
 
 [[projects]]
   digest = "1:642cf8e80572f9dc0677b0f241c8ab2e715c9dccc215270ea873c86ddca0062c"
@@ -42,7 +42,7 @@
   version = "v0.3.1"
 
 [[projects]]
-  digest = "1:0fb45985b0509374ef95e9b0549cd1a4646dc371cab4d7c39ee74bb19c0a8397"
+  digest = "1:fbe1bb58d22bf22b37adc61b3314306ae579106b6fc19a8bb8529dce32814bbd"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -80,8 +80,8 @@
     "service/sts/stsiface",
   ]
   pruneopts = "NUT"
-  revision = "a27888d3507a35a68e9240d5d7cf0d9552e6ef3b"
-  version = "v1.28.2"
+  revision = "10653500713c229d4ef93175510476c3cc385299"
+  version = "v1.28.3"
 
 [[projects]]
   digest = "1:707ebe952a8b3d00b343c01536c79c73771d100f63ec6babeaed5c79e2b8a8dd"
@@ -501,7 +501,7 @@
   revision = "2cfd321de3ee5d5f8a5fda2521d1703478334d98"
 
 [[projects]]
-  digest = "1:85674ac609b704fd4e9f463553b6ffc3a3527a993ae0ba550eb56beaabdfe094"
+  digest = "1:94b2c0ce9cbf81b32d0fb28057382fe65e96256734edacff926bca6882c531f3"
   name = "go.uber.org/zap"
   packages = [
     ".",
@@ -512,7 +512,8 @@
     "zapcore",
   ]
   pruneopts = "NUT"
-  revision = "67bc79d13d155c02fd008f721863ff8cc5f30659"
+  revision = "33e58d4d0120aa28d4df84cd244838c490846c9d"
+  version = "v1.13.0"
 
 [[projects]]
   branch = "master"
@@ -582,14 +583,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:855811b1c0699e1d3852fc4670d880ae4c80682a7b970faada7668e616294e6b"
+  digest = "1:bff95885e147abf1b0788ac18006a0cbb3d2e57e9940881a57e431fe283d7eda"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "NUT"
-  revision = "86b910548bc16777f40503131aa424ae0a092199"
+  revision = "b77594299b429d05028403d72b68172959c7dad5"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -645,7 +646,7 @@
     "internal/semver",
   ]
   pruneopts = "NUT"
-  revision = "de0b1760071a7dbf351db0f2345566f3d2f4c7e1"
+  revision = "473961ec044c1c001df816e5edb29e4a31db4c01"
 
 [[projects]]
   digest = "1:658567ee8cf9149bcb84fbc019f4577be73aae97903e9bdcffc9a0abfa339ef5"
@@ -687,7 +688,8 @@
   version = "v1.6.5"
 
 [[projects]]
-  digest = "1:3689f4cc57cc55b4631efc4b778c47d2a888a7060b4108f42cf289a2033be5ba"
+  branch = "master"
+  digest = "1:c21ea6f419a93a0d98aee5083cedbcbe1ca43aa0da73a5f3c7568c1dc926c1bf"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api",
@@ -700,10 +702,11 @@
     "googleapis/devtools/cloudtrace/v2",
     "googleapis/monitoring/v3",
     "googleapis/rpc/status",
+    "googleapis/type/calendarperiod",
     "protobuf/field_mask",
   ]
   pruneopts = "NUT"
-  revision = "357c62f0e4bbba7e6cc403ae09edcf3e2b9028fe"
+  revision = "ca5a22157cba8746e7aa978de1b1ac4085150840"
 
 [[projects]]
   digest = "1:81fc76a3a29cafb597e19c2016c278f0ffa44c98893de090ec0c924643c68918"
@@ -1145,11 +1148,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:03a96603922fc1f6895ae083e1e16d943b55ef0656b56965351bd87e7d90485f"
+  branch = "master"
+  digest = "1:42674e29bf0cf4662d49bd9528e24b9ecc4895b32d0be281f9cf04d3a7671846"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/util/proto"]
   pruneopts = "NUT"
-  revision = "b3a7cee44a305be0a69e1b9ac03018307287e1b0"
+  revision = "30be4d16710ac61bce31eb28a01054596fe6a9f1"
 
 [[projects]]
   branch = "master"

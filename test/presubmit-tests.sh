@@ -28,9 +28,6 @@ if [[ ${TEST_ENV}="local" ]]; then
     echo ">> go fmt ./..."
     go fmt ./...
 
-    echo ">> go vet ./..."
-    go vet ./...
-
     main --build-tests --unit-tests
   fi
 fi

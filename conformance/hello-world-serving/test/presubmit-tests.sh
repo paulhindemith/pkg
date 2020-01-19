@@ -26,18 +26,15 @@ if [[ ${TEST_ENV}="local" ]]; then
   else
     echo ">> cd ${REPO_ROOT_DIR}"
     cd ${REPO_ROOT_DIR}
-    #
-    # echo ">> ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh"
-    # ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh Paulhindemith
-    #
-    # echo ">> ${REPO_ROOT_DIR}/conformance/hello-world-serving/hack/update-deps.sh"
-    # ${REPO_ROOT_DIR}/conformance/hello-world-serving/hack/update-deps.sh
-    #
-    # echo ">> go fmt ./..."
-    # go fmt ./...
-    #
-    echo ">> go vet ./..."
-    go vet ./...
+
+    echo ">> ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh"
+    ${REPO_ROOT_DIR}/vendor/github.com/paulhindemith/dev-infra/hack/boilerplate/ensure-boilerplate.sh Paulhindemith
+
+    echo ">> ${REPO_ROOT_DIR}/conformance/hello-world-serving/hack/update-deps.sh"
+    ${REPO_ROOT_DIR}/conformance/hello-world-serving/hack/update-deps.sh
+
+    echo ">> go fmt ./..."
+    go fmt ./...
 
     echo ">> main"
     main --build-tests --unit-tests
